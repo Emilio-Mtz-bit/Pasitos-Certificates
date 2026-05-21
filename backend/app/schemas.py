@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from typing import Optional, List
 from datetime import date
 from decimal import Decimal
@@ -7,6 +7,13 @@ from decimal import Decimal
 class ParticipantCreate(BaseModel):
     nombre_completo: str
     curp: str
+
+    @field_validator('curp')
+    @classmethod
+    def curp_debe_tener_18_caracteres(cls, v):
+        if len(v.strip()) != 18:
+            raise ValueError('La CURP debe tener exactamente 18 caracteres')
+        return v.strip().upper()
     fecha_nacimiento: Optional[date] = None
     correo_electronico: Optional[str] = None
     institucion: Optional[str] = None

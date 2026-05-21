@@ -19,6 +19,7 @@ export default function Instructor() {
 
   async function handleSearch() {
     if (!curpInput.trim()) return
+    if (curpInput.trim().length !== 18) { setError('La CURP debe tener exactamente 18 caracteres'); return }
     setLoading(true); setError(''); setParticipant(null); setShowForm(false); setFolio(null)
     try {
       const results = await api.searchParticipants(curpInput.trim().toUpperCase())
@@ -33,6 +34,8 @@ export default function Instructor() {
   }
 
   async function handleCreate() {
+    if (!newP.nombre_completo.trim()) { setError('El nombre completo es obligatorio'); return }
+    if (newP.curp.trim().length !== 18) { setError('La CURP debe tener exactamente 18 caracteres'); return }
     setLoading(true); setError('')
     try {
       const p = await api.createParticipant(newP)
