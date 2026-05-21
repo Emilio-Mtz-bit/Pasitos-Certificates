@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .database import engine, Base
-from .routers import courses, participants, enrollments
+from .routers import courses, participants, enrollments, verify
 
 Base.metadata.create_all(bind=engine)
 
@@ -18,6 +18,7 @@ app.add_middleware(
 app.include_router(courses.router)
 app.include_router(participants.router)
 app.include_router(enrollments.router)
+app.include_router(verify.router)
 
 
 @app.get("/health")
