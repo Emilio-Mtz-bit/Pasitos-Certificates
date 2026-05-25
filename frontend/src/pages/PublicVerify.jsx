@@ -24,7 +24,7 @@ export default function PublicVerify() {
       const data = await api.verifyCertificate(folio.trim(), nombre.trim())
       setResult(data)
     } catch (e) {
-      setError('Error al conectar con el servidor. ¿Está corriendo el backend?')
+      setError(e.message || 'Error al conectar con el servidor. ¿Está corriendo el backend?')
     } finally { setLoading(false) }
   }
 
