@@ -77,3 +77,15 @@ class CertificateEmitOut(BaseModel):
     fecha_emision: Optional[date] = None
 
     model_config = {"from_attributes": True}
+
+
+class CertificateSearchOut(BaseModel):
+    id: str
+    no_certificado: str
+    folio_verificacion: str
+    estado: str
+    fecha_emision: Optional[date] = None
+    nombre: str
+    curp: str
+    curso: str
+    calificacion: Optional[Decimal] = None
