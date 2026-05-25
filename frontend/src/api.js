@@ -38,5 +38,5 @@ export const rejectEnrollment = (id) =>
 export const emitCertificate = (id) =>
   request(`/enrollments/${id}/emit`, { method: 'PATCH' })
 
-export const verifyCertificate = (folio) =>
-  request(`/verify/${encodeURIComponent(folio)}`)
+export const verifyCertificate = (folio, nombre) =>
+  request(`/verify/${encodeURIComponent(folio)}?nombre=${encodeURIComponent(nombre)}`)

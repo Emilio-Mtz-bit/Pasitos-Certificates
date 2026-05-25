@@ -7,19 +7,21 @@ const MENSAJES = {
   certificado_revocado: 'Este certificado ha sido revocado por Pasitos Education & Health A.C.',
   hash_no_coincide: 'Los datos de este certificado han sido alterados. No es válido.',
   firma_invalida: 'La firma digital de este certificado no es válida.',
+  nombre_no_coincide: 'El nombre ingresado no coincide con el titular del certificado.',
 }
 
 export default function PublicVerify() {
   const [folio, setFolio] = useState('')
+  const [nombre, setNombre] = useState('')
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
   async function handleVerify() {
-    if (!folio.trim()) return
+    if (!folio.trim() || !nombre.trim()) { setError('Ingresa el folio y el nombre completo del titular'); return }
     setLoading(true); setError(''); setResult(null)
     try {
-      const data = await api.verifyCertificate(folio.trim())
+      const data = await api.verifyCertificate(folio.trim(), nombre.trim())
       setResult(data)
     } catch (e) {
       setError('Error al conectar con el servidor. ¿Está corriendo el backend?')
@@ -47,21 +49,35 @@ export default function PublicVerify() {
 
       {/* Buscador */}
       <div style={{ ...card, width: '100%', maxWidth: 520, marginBottom: '2rem' }}>
-        <label style={{ fontSize: '0.85rem', fontWeight: 600, color: colors.textLight, display: 'block', marginBottom: 8 }}>
-          Folio de verificación
-        </label>
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <input
-            style={input}
-            placeholder="Ej. VER-0001"
-            value={folio}
-            onChange={e => setFolio(e.target.value.toUpperCase())}
-            onKeyDown={e => e.key === 'Enter' && handleVerify()}
-          />
-          <button style={{ ...btn.primary, whiteSpace: 'nowrap' }} onClick={handleVerify} disabled={loading}>
-            {loading ? '...' : 'Verificar'}
-          </button>
+        <div style={{ display: 'grid', gap: '0.75rem', marginBottom: '0.75rem' }}>
+          <div>
+            <label style={{ fontSize: '0.85rem', fontWeight: 600, color: colors.textLight, display: 'block', marginBottom: 8 }}>
+              Folio de verificación
+            </label>
+            <input
+              style={input}
+              placeholder="Ej. VER-0001"
+              value={folio}
+              onChange={e => setFolio(e.target.value.toUpperCase())}
+              onKeyDown={e => e.key === 'Enter' && handleVerify()}
+            />
+          </div>
+          <div>
+            <label style={{ fontSize: '0.85rem', fontWeight: 600, color: colors.textLight, display: 'block', marginBottom: 8 }}>
+              Nombre completo del titular
+            </label>
+            <input
+              style={input}
+              placeholder="Ej. Santiago Reza Mendoza"
+              value={nombre}
+              onChange={e => setNombre(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleVerify()}
+            />
+          </div>
         </div>
+        <button style={{ ...btn.primary, width: '100%' }} onClick={handleVerify} disabled={loading}>
+          {loading ? '...' : 'Verificar'}
+        </button>
         {error && <div style={{ color: colors.errorText, fontSize: '0.9rem', marginTop: '0.5rem' }}>{error}</div>}
       </div>
 
@@ -112,7 +128,7 @@ export default function PublicVerify() {
             <p style={{ color: colors.errorText, fontWeight: 600, fontSize: '1rem', margin: 0 }}>
               {MENSAJES[result.razon] || result.mensaje || 'Este certificado no es válido.'}
             </p>
-            <button style={{ ...btn.secondary, marginTop: '1rem' }} onClick={() => { setResult(null); setFolio('') }}>
+            <button style={{ ...btn.secondary, marginTop: '1rem' }} onClick={() => { setResult(null); setFolio(''); setNombre('') }}>
               Intentar con otro folio
             </button>
           </div>

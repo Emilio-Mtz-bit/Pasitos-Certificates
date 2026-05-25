@@ -9,7 +9,7 @@ router = APIRouter(prefix="/verify", tags=["verify"])
 
 
 @router.get("/{folio}")
-def verificar_por_folio(folio: str, request: Request, db: Session = Depends(get_db)):
+def verificar_por_folio(folio: str, nombre: str, request: Request, db: Session = Depends(get_db)):
     cert = db.query(models.Certificate).filter(
         models.Certificate.folio_verificacion == folio
     ).first()
@@ -76,6 +76,16 @@ def verificar_por_folio(folio: str, request: Request, db: Session = Depends(get_
             "valido": False,
             "razon": "firma_invalida",
             "mensaje": "La firma digital de este certificado no es válida.",
+        }
+
+    if participant.nombre_completo.strip().upper() != nombre.strip().upper():
+        log.resultado = models.ResultadoVerificacion.no_encontrado
+        db.add(log)
+        db.commit()
+        return {
+            "valido": False,
+            "razon": "nombre_no_coincide",
+            "mensaje": "El nombre ingresado no coincide con el titular del certificado.",
         }
 
     log.resultado = models.ResultadoVerificacion.valido
