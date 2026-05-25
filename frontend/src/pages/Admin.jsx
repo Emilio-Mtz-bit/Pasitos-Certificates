@@ -69,7 +69,7 @@ function PendientesTab() {
       setEmitted(cert)
       setShowModal(false)
       setSelected(null)
-      loadPending()
+      await loadPending()
     } catch (e) { setError(e.message) }
     finally { setLoading(false) }
   }
@@ -79,7 +79,7 @@ function PendientesTab() {
     try {
       await api.rejectEnrollment(selected.id)
       setSelected(null)
-      loadPending()
+      await loadPending()
     } catch (e) { setError(e.message) }
     finally { setLoading(false) }
   }
