@@ -40,3 +40,12 @@ export const emitCertificate = (id) =>
 
 export const verifyCertificate = (folio, nombre) =>
   request(`/verify/${encodeURIComponent(folio)}?nombre=${encodeURIComponent(nombre)}`)
+
+export const searchCertificatesByCurp = (curp) =>
+  request(`/certificates/?curp=${encodeURIComponent(curp)}`)
+
+export const searchCertificateByFolio = (folio) =>
+  request(`/certificates/?folio=${encodeURIComponent(folio)}`)
+
+export const revokeCertificate = (id) =>
+  request(`/certificates/${id}/revoke`, { method: 'PATCH' })
