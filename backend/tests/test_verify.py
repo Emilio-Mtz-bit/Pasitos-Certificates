@@ -21,7 +21,7 @@ def certificado_emitido(client):
 
 def test_verificar_folio_valido(client, certificado_emitido):
     folio = certificado_emitido["folio_verificacion"]
-    response = client.get(f"/verify/{folio}")
+    response = client.get(f"/verify/{folio}?nombre=Mar%C3%ADa+L%C3%B3pez+Hern%C3%A1ndez")
     assert response.status_code == 200
     data = response.json()
     assert data["valido"] is True
@@ -32,7 +32,7 @@ def test_verificar_folio_valido(client, certificado_emitido):
 
 
 def test_verificar_folio_inexistente(client):
-    response = client.get("/verify/VER-9999")
+    response = client.get("/verify/VER-9999?nombre=Cualquier+Nombre")
     assert response.status_code == 200
     data = response.json()
     assert data["valido"] is False
@@ -42,7 +42,7 @@ def test_verificar_folio_inexistente(client):
 def test_verify_log_se_registra(client, certificado_emitido, db):
     from app import models
     folio = certificado_emitido["folio_verificacion"]
-    client.get(f"/verify/{folio}")
+    client.get(f"/verify/{folio}?nombre=Mar%C3%ADa+L%C3%B3pez+Hern%C3%A1ndez")
     logs = db.query(models.VerifyLog).all()
     assert len(logs) == 1
     assert logs[0].resultado == models.ResultadoVerificacion.valido
