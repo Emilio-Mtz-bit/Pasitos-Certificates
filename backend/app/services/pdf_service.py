@@ -291,14 +291,21 @@ def generar_pdf_certificado(cert: models.Certificate) -> str:
     c.setFillColor(GRAY)
     c.setFont("Helvetica", 6)
     c.drawString(BOX_X + 8, 155, "Escanea para verificar autenticidad")
-    c.drawString(BOX_X + 8, 145, "o ingresa:")
+    c.drawString(BOX_X + 8, 145, "o haz clic en el enlace:")
     c.setFillColor(PURPLE)
-    c.drawString(BOX_X + 8, 135, f"{public_url}/public")
+    link_text = "Verificar certificado »"
+    c.drawString(BOX_X + 8, 135, link_text)
+    # Hyperlink real apuntando a la URL completa con folio + nombre
+    link_text_w = c.stringWidth(link_text, "Helvetica", 6)
+    c.linkURL(verify_url, (BOX_X + 6, 130, BOX_X + 10 + link_text_w, 142), relative=0)
 
-    # QR code
+    # QR code (también clickable a la misma URL)
     qr_img = _qr_image(verify_url)
     qr_size = 78
-    c.drawImage(qr_img, BOX_X + BOX_W - qr_size - 8, 120, width=qr_size, height=qr_size)
+    qr_x = BOX_X + BOX_W - qr_size - 8
+    qr_y = 120
+    c.drawImage(qr_img, qr_x, qr_y, width=qr_size, height=qr_size)
+    c.linkURL(verify_url, (qr_x, qr_y, qr_x + qr_size, qr_y + qr_size), relative=0)
 
     # Firma digital (pie)
     c.setFillColor(GRAY)
