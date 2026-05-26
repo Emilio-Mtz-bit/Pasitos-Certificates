@@ -68,7 +68,7 @@ def generar_pdf_certificado(cert: models.Certificate) -> str:
     course = enr.course
 
     public_url = os.getenv("PUBLIC_VERIFY_URL", "http://localhost:5173")
-    verify_url = f"{public_url}?folio={cert.folio_verificacion}"
+    verify_url = f"{public_url}/public?folio={cert.folio_verificacion}"
 
     storage_dir = Path(__file__).parent.parent.parent / "storage" / "certificates"
     storage_dir.mkdir(parents=True, exist_ok=True)
@@ -291,7 +291,7 @@ def generar_pdf_certificado(cert: models.Certificate) -> str:
     c.drawString(BOX_X + 8, 155, "Escanea para verificar autenticidad")
     c.drawString(BOX_X + 8, 145, "o ingresa:")
     c.setFillColor(PURPLE)
-    c.drawString(BOX_X + 8, 135, public_url)
+    c.drawString(BOX_X + 8, 135, f"{public_url}/public")
 
     # QR code
     qr_img = _qr_image(verify_url)
