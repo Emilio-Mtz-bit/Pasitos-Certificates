@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import * as api from '../api'
 import { colors, font, card, input, btn } from '../styles'
 
@@ -16,6 +16,12 @@ export default function PublicVerify() {
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const f = params.get('folio')
+    if (f) setFolio(f.toUpperCase())
+  }, [])
 
   async function handleVerify() {
     if (!folio.trim() || !nombre.trim()) { setError('Ingresa el folio y el nombre completo del titular'); return }

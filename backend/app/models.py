@@ -107,6 +107,7 @@ class Certificate(Base):
     firma_gpg = Column(Text, nullable=False)
     estado = Column(SAEnum(EstadoCertificado), default=EstadoCertificado.activo)
     fecha_emision = Column(Date)
+    pdf_path = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     enrollment = relationship("Enrollment")

@@ -1,9 +1,10 @@
 import os
+import logging
 from datetime import date
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 from .. import models
-from . import hash_service, gpg_service
+from . import hash_service, gpg_service, pdf_service
 
 load_dotenv()
 
@@ -77,4 +78,12 @@ def emitir_certificado(db: Session, enrollment_id: str) -> models.Certificate:
     db.add(cert)
     db.commit()
     db.refresh(cert)
+
+    try:
+        pdf_path = pdf_service.generar_pdf_certificado(cert)
+        cert.pdf_path = pdf_path
+        db.commit()
+    except Exception as e:
+        logging.error(f"Error generando PDF para {cert.no_certificado}: {e}")
+
     return cert

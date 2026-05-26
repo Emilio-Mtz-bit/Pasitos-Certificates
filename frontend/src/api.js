@@ -49,3 +49,6 @@ export const searchCertificateByFolio = (folio) =>
 
 export const revokeCertificate = (id) =>
   request(`/certificates/${id}/revoke`, { method: 'PATCH' })
+
+export const getCertificatePdfUrl = (id) =>
+  `${BASE}/certificates/${id}/pdf`

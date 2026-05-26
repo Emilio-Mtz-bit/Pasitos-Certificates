@@ -102,9 +102,17 @@ function PendientesTab() {
               <span style={{ fontWeight: 600 }}>SHA-256:</span> {emitted.cert_hash}
             </div>
           </div>
-          <button onClick={() => setEmitted(null)} style={{ ...btn.secondary, marginTop: '0.75rem', fontSize: '0.9rem' }}>
-            Ver más inscripciones
-          </button>
+          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
+            <button onClick={() => setEmitted(null)} style={{ ...btn.secondary, fontSize: '0.9rem' }}>
+              Ver más inscripciones
+            </button>
+            <button
+              onClick={() => window.open(api.getCertificatePdfUrl(emitted.id), '_blank')}
+              style={{ ...btn.primary, fontSize: '0.9rem' }}
+            >
+              Descargar PDF
+            </button>
+          </div>
         </div>
       )}
 
@@ -345,9 +353,17 @@ function CertificadosTab() {
               </div>
 
               {selected.estado === 'activo' && (
-                <button style={btn.danger} onClick={() => setShowModal(true)}>
-                  Revocar certificado
-                </button>
+                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                  <button
+                    style={btn.secondary}
+                    onClick={() => window.open(api.getCertificatePdfUrl(selected.id), '_blank')}
+                  >
+                    Ver PDF
+                  </button>
+                  <button style={btn.danger} onClick={() => setShowModal(true)}>
+                    Revocar certificado
+                  </button>
+                </div>
               )}
             </>
           )}

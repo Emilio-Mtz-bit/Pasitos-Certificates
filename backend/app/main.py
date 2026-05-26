@@ -1,9 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 from .database import engine, Base
 from .routers import courses, participants, enrollments, verify, certificates
 
 Base.metadata.create_all(bind=engine)
+
+with engine.connect() as _conn:
+    _cols = [r[1] for r in _conn.execute(text("PRAGMA table_info(certificates)"))]
+    if "pdf_path" not in _cols:
+        _conn.execute(text("ALTER TABLE certificates ADD COLUMN pdf_path TEXT"))
+        _conn.commit()
 
 app = FastAPI(title="Pasitos Certificates API", version="1.0.0-demo")
 

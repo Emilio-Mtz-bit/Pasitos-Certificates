@@ -1,4 +1,6 @@
+import os
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from .. import models, schemas
 from ..database import get_db
@@ -38,6 +40,20 @@ def search_certificates(curp: str = None, folio: str = None, db: Session = Depen
             "calificacion": enr.calificacion,
         })
     return result
+
+
+@router.get("/{certificate_id}/pdf")
+def download_pdf(certificate_id: str, db: Session = Depends(get_db)):
+    cert = db.query(models.Certificate).filter(models.Certificate.id == certificate_id).first()
+    if not cert:
+        raise HTTPException(status_code=404, detail="Certificado no encontrado")
+    if not cert.pdf_path or not os.path.exists(cert.pdf_path):
+        raise HTTPException(status_code=404, detail="PDF no disponible para este certificado")
+    return FileResponse(
+        cert.pdf_path,
+        media_type="application/pdf",
+        filename=f"{cert.no_certificado}.pdf",
+    )
 
 
 @router.patch("/{certificate_id}/revoke", response_model=schemas.CertificateSearchOut)

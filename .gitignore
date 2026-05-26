@@ -18,6 +18,9 @@ backend/.env
 frontend/node_modules/
 frontend/dist/
 
+# Generated certificates (PDFs)
+backend/storage/certificates/*.pdf
+
 # OS
 .DS_Store
 Thumbs.db
