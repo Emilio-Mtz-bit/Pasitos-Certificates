@@ -20,7 +20,16 @@ export default function PublicVerify() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const f = params.get('folio')
+    const n = params.get('nombre')
     if (f) setFolio(f.toUpperCase())
+    if (n) setNombre(n)
+    if (f && n) {
+      setLoading(true)
+      api.verifyCertificate(f.trim(), n.trim())
+        .then(data => setResult(data))
+        .catch(e => setError(e.message || 'Error al verificar'))
+        .finally(() => setLoading(false))
+    }
   }, [])
 
   async function handleVerify() {

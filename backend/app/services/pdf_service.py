@@ -68,7 +68,9 @@ def generar_pdf_certificado(cert: models.Certificate) -> str:
     course = enr.course
 
     public_url = os.getenv("PUBLIC_VERIFY_URL", "http://localhost:5173")
-    verify_url = f"{public_url}/public?folio={cert.folio_verificacion}"
+    from urllib.parse import quote
+    nombre_enc = quote(participant.nombre_completo)
+    verify_url = f"{public_url}/public?folio={cert.folio_verificacion}&nombre={nombre_enc}"
 
     storage_dir = Path(__file__).parent.parent.parent / "storage" / "certificates"
     storage_dir.mkdir(parents=True, exist_ok=True)
