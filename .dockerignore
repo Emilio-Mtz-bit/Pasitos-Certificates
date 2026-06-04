@@ -1,0 +1,32 @@
+# Python
+**/__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+backend/venv/
+backend/.venv/
+*.egg-info/
+
+# Entorno y secretos (se regeneran dentro del contenedor)
+backend/.env
+*.env
+
+# Bases de datos SQLite locales
+*.db
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# PDFs generados
+backend/storage/certificates/*.pdf
+
+# Git / OS / docs no necesarios para construir
+.git/
+.gitignore
+docs/
+Presentacion/
+*.md
+start-demo.*
+.DS_Store
+Thumbs.db
