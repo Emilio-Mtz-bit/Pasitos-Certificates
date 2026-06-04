@@ -21,6 +21,9 @@ frontend/dist/
 # Generated certificates (PDFs)
 backend/storage/certificates/*.pdf
 
+# Presentation material (binarios, fuera del repo)
+Presentacion/
+
 # OS
 .DS_Store
 Thumbs.db
