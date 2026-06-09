@@ -30,6 +30,21 @@ def create_enrollment(data: schemas.EnrollmentCreate, db: Session = Depends(get_
     return enrollment
 
 
+@router.patch("/{enrollment_id}", response_model=schemas.EnrollmentOut)
+def update_enrollment(enrollment_id: str, data: schemas.EnrollmentUpdate, db: Session = Depends(get_db)):
+    enrollment = db.query(models.Enrollment).filter(models.Enrollment.id == enrollment_id).first()
+    if not enrollment:
+        raise HTTPException(status_code=404, detail="Inscripción no encontrada")
+    if enrollment.estado != models.EstadoCertificado.borrador:
+        raise HTTPException(status_code=400, detail="Solo se pueden editar inscripciones en borrador")
+    update_data = data.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(enrollment, key, value)
+    db.commit()
+    db.refresh(enrollment)
+    return enrollment
+
+
 @router.patch("/{enrollment_id}/submit", response_model=schemas.EnrollmentOut)
 def submit_enrollment(enrollment_id: str, db: Session = Depends(get_db)):
     enrollment = db.query(models.Enrollment).filter(models.Enrollment.id == enrollment_id).first()

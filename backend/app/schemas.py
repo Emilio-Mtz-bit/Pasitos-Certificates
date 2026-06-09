@@ -53,6 +53,12 @@ class EnrollmentCreate(BaseModel):
     calificacion: Decimal
 
 
+class EnrollmentUpdate(BaseModel):
+    calificacion: Optional[Decimal] = None
+    fecha_inicio: Optional[date] = None
+    fecha_termino: Optional[date] = None
+
+
 class EnrollmentOut(BaseModel):
     id: str
     participant_id: str

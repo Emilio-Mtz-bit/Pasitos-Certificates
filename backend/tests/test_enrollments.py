@@ -129,3 +129,40 @@ def test_enrollment_out_incluye_observaciones(client, participant_id):
         "calificacion": 9.5,
     }).json()
     assert "observaciones" in enr
+
+
+def test_actualizar_inscripcion_en_borrador(client, participant_id):
+    enr = client.post("/enrollments/", json={
+        "participant_id": participant_id,
+        "course_id": "course-test-1",
+        "fecha_inicio": "2025-03-01",
+        "fecha_termino": "2025-03-28",
+        "calificacion": 9.5,
+    }).json()
+    response = client.patch(f"/enrollments/{enr['id']}", json={
+        "calificacion": 8.0,
+        "fecha_inicio": "2025-04-01",
+        "fecha_termino": "2025-04-30",
+    })
+    assert response.status_code == 200
+    data = response.json()
+    assert float(data["calificacion"]) == 8.0
+    assert data["fecha_inicio"] == "2025-04-01"
+
+
+def test_no_actualizar_inscripcion_no_borrador(client, participant_id):
+    enr = client.post("/enrollments/", json={
+        "participant_id": participant_id,
+        "course_id": "course-test-1",
+        "fecha_inicio": "2025-03-01",
+        "fecha_termino": "2025-03-28",
+        "calificacion": 9.5,
+    }).json()
+    client.patch(f"/enrollments/{enr['id']}/submit")
+    response = client.patch(f"/enrollments/{enr['id']}", json={"calificacion": 8.0})
+    assert response.status_code == 400
+
+
+def test_actualizar_inscripcion_no_encontrada(client):
+    response = client.patch("/enrollments/no-existe", json={"calificacion": 8.0})
+    assert response.status_code == 404
