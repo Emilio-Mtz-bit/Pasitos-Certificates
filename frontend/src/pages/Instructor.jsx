@@ -109,11 +109,14 @@ export default function Instructor() {
   async function handleSaveEdit(id) {
     setLoading(true); setError('')
     try {
-      const updated = await api.updateEnrollment(id, {
-        calificacion: parseFloat(editForm.calificacion),
+      const payload = {
         fecha_inicio: editForm.fecha_inicio,
         fecha_termino: editForm.fecha_termino,
-      })
+      }
+      if (editForm.calificacion !== '') {
+        payload.calificacion = parseFloat(editForm.calificacion)
+      }
+      const updated = await api.updateEnrollment(id, payload)
       setEnrollments(prev => prev.map(e => e.id === id ? updated : e))
       setEditingId(null)
     } catch (e) { setError(e.message) }
@@ -125,6 +128,7 @@ export default function Instructor() {
     try {
       const updated = await api.submitEnrollment(id)
       setEnrollments(prev => prev.map(e => e.id === id ? { ...e, estado: updated.estado } : e))
+      setEditingId(null)
     } catch (e) { setError(e.message) }
     finally { setLoading(false) }
   }
