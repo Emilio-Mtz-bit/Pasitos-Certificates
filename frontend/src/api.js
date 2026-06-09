@@ -52,3 +52,13 @@ export const revokeCertificate = (id) =>
 
 export const getCertificatePdfUrl = (id) =>
   `${BASE}/certificates/${id}/pdf`
+
+export const getEnrollmentsByCourse = (courseId) =>
+  request(`/enrollments/?course_id=${encodeURIComponent(courseId)}`)
+
+export const updateEnrollment = (id, data) =>
+  request(`/enrollments/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
