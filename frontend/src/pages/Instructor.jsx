@@ -193,6 +193,29 @@ export default function Instructor() {
     finally { setLoading(false) }
   }
 
+  async function handleModalSaveDraft() {
+    if (!modalParticipant) { setError('Error: no hay participante seleccionado'); return }
+    if (!enrollForm.fecha_inicio || !enrollForm.fecha_termino || !enrollForm.calificacion) {
+      setError('Completa todos los campos'); return
+    }
+    setLoading(true); setError('')
+    try {
+      await api.createEnrollment({
+        participant_id: modalParticipant.id,
+        course_id: selectedCourse.id,
+        fecha_inicio: enrollForm.fecha_inicio,
+        fecha_termino: enrollForm.fecha_termino,
+        calificacion: parseFloat(enrollForm.calificacion),
+      })
+      const updated = await api.getEnrollmentsByCourse(selectedCourse.id)
+      setEnrollments(updated)
+      closeModal()
+      setSuccess('Inscripción guardada como borrador')
+      setTimeout(() => setSuccess(''), 4000)
+    } catch (e) { setError(e.message) }
+    finally { setLoading(false) }
+  }
+
   // ── Pantalla 1: Selección de curso ──────────────────────────────
 
   if (view === 'courses') {
@@ -484,9 +507,12 @@ export default function Instructor() {
                     value={enrollForm.calificacion}
                     onChange={e => setEnrollForm(f => ({ ...f, calificacion: e.target.value }))} />
                 </div>
-                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.25rem' }}>
+                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.25rem', flexWrap: 'wrap' }}>
                   <button style={{ ...btn.secondary, flex: '0 0 auto' }} onClick={() => { setModalStep(1); setError('') }}>
                     ← Volver
+                  </button>
+                  <button style={{ ...btn.secondary, flex: 1 }} onClick={handleModalSaveDraft} disabled={loading}>
+                    {loading ? '...' : 'Guardar borrador'}
                   </button>
                   <button style={{ ...btn.primary, flex: 1 }} onClick={handleModalEnroll} disabled={loading}>
                     {loading ? 'Enviando...' : 'Enviar a revisión →'}
