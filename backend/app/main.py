@@ -36,14 +36,21 @@ with engine.connect() as _conn:
                 firma_gpg TEXT NOT NULL,
                 estado VARCHAR NOT NULL,
                 fecha_emision DATE,
-                pdf_path VARCHAR,
                 created_at DATETIME DEFAULT (CURRENT_TIMESTAMP),
+                pdf_path VARCHAR,
                 PRIMARY KEY (id),
                 FOREIGN KEY(enrollment_id) REFERENCES enrollments(id),
                 FOREIGN KEY(gpg_key_id) REFERENCES gpg_keys(id)
             )
         """))
-        _conn.execute(text("INSERT INTO certificates_new SELECT * FROM certificates"))
+        _conn.execute(text("""
+            INSERT INTO certificates_new
+                (id, enrollment_id, gpg_key_id, no_certificado, folio_verificacion,
+                 cert_hash, firma_gpg, estado, fecha_emision, created_at, pdf_path)
+            SELECT id, enrollment_id, gpg_key_id, no_certificado, folio_verificacion,
+                   cert_hash, firma_gpg, estado, fecha_emision, created_at, pdf_path
+            FROM certificates
+        """))
         _conn.execute(text("DROP TABLE certificates"))
         _conn.execute(text("ALTER TABLE certificates_new RENAME TO certificates"))
         _conn.execute(text("PRAGMA foreign_keys=ON"))
