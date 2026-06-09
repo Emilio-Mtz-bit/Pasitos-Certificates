@@ -59,6 +59,10 @@ class EnrollmentUpdate(BaseModel):
     fecha_termino: Optional[date] = None
 
 
+class EnrollmentReject(BaseModel):
+    observaciones: Optional[str] = None
+
+
 class EnrollmentOut(BaseModel):
     id: str
     participant_id: str

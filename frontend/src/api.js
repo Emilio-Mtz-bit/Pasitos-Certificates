@@ -32,8 +32,12 @@ export const submitEnrollment = (id) =>
 export const getPendingEnrollments = () =>
   request('/enrollments/?estado=pendiente')
 
-export const rejectEnrollment = (id) =>
-  request(`/enrollments/${id}/reject`, { method: 'PATCH' })
+export const rejectEnrollment = (id, observaciones = null) =>
+  request(`/enrollments/${id}/reject`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ observaciones }),
+  })
 
 export const emitCertificate = (id) =>
   request(`/enrollments/${id}/emit`, { method: 'PATCH' })
@@ -62,3 +66,6 @@ export const updateEnrollment = (id, data) =>
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   })
+
+export const resetEnrollment = (id) =>
+  request(`/enrollments/${id}/reset`, { method: 'PATCH' })

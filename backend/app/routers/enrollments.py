@@ -57,11 +57,26 @@ def submit_enrollment(enrollment_id: str, db: Session = Depends(get_db)):
 
 
 @router.patch("/{enrollment_id}/reject", response_model=schemas.EnrollmentOut)
-def reject_enrollment(enrollment_id: str, db: Session = Depends(get_db)):
+def reject_enrollment(enrollment_id: str, data: schemas.EnrollmentReject = schemas.EnrollmentReject(), db: Session = Depends(get_db)):
     enrollment = db.query(models.Enrollment).filter(models.Enrollment.id == enrollment_id).first()
     if not enrollment:
         raise HTTPException(status_code=404, detail="Inscripción no encontrada")
     enrollment.estado = models.EstadoCertificado.borrador
+    enrollment.observaciones = data.observaciones
+    db.commit()
+    db.refresh(enrollment)
+    return enrollment
+
+
+@router.patch("/{enrollment_id}/reset", response_model=schemas.EnrollmentOut)
+def reset_enrollment(enrollment_id: str, db: Session = Depends(get_db)):
+    enrollment = db.query(models.Enrollment).filter(models.Enrollment.id == enrollment_id).first()
+    if not enrollment:
+        raise HTTPException(status_code=404, detail="Inscripción no encontrada")
+    if enrollment.estado != models.EstadoCertificado.revocado:
+        raise HTTPException(status_code=400, detail="Solo se pueden reactivar inscripciones revocadas")
+    enrollment.estado = models.EstadoCertificado.borrador
+    enrollment.observaciones = None
     db.commit()
     db.refresh(enrollment)
     return enrollment

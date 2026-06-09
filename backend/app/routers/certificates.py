@@ -64,9 +64,10 @@ def revoke_certificate(certificate_id: str, db: Session = Depends(get_db)):
     if cert.estado == models.EstadoCertificado.revocado:
         raise HTTPException(status_code=400, detail="El certificado ya está revocado")
     cert.estado = models.EstadoCertificado.revocado
+    enr = cert.enrollment
+    enr.estado = models.EstadoCertificado.revocado
     db.commit()
     db.refresh(cert)
-    enr = cert.enrollment
     return {
         "id": cert.id,
         "no_certificado": cert.no_certificado,

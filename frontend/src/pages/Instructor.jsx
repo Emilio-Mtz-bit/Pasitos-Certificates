@@ -133,6 +133,15 @@ export default function Instructor() {
     finally { setLoading(false) }
   }
 
+  async function handleReset(id) {
+    setLoading(true); setError('')
+    try {
+      const updated = await api.resetEnrollment(id)
+      setEnrollments(prev => prev.map(e => e.id === id ? updated : e))
+    } catch (e) { setError(e.message) }
+    finally { setLoading(false) }
+  }
+
   function openModal() {
     setShowModal(true); setModalStep(1)
     setCurpInput(''); setModalParticipant(null); setShowNewP(false)
@@ -339,6 +348,14 @@ export default function Instructor() {
                       <td style={{ ...tdStyle, whiteSpace: 'nowrap' }}>
                         {enr.estado === 'borrador' && !isEditing && (
                           <>
+                            {enr.observaciones && (
+                              <button
+                                onClick={() => setExpandedId(isExpanded ? null : enr.id)}
+                                style={{ ...btn.secondary, fontSize: '0.8rem', padding: '0.3rem 0.75rem', marginRight: 6, borderColor: '#721c24', color: '#721c24' }}
+                              >
+                                {isExpanded ? 'Cerrar' : 'Ver comentarios'}
+                              </button>
+                            )}
                             <button onClick={() => openEdit(enr)} style={{ ...btn.secondary, fontSize: '0.8rem', padding: '0.3rem 0.75rem', marginRight: 6 }}>
                               Editar
                             </button>
@@ -347,13 +364,30 @@ export default function Instructor() {
                             </button>
                           </>
                         )}
-                        {enr.estado !== 'borrador' && (
+                        {enr.estado !== 'borrador' && enr.estado !== 'revocado' && (
                           <button
                             onClick={() => setExpandedId(isExpanded ? null : enr.id)}
                             style={{ ...btn.secondary, fontSize: '0.8rem', padding: '0.3rem 0.75rem' }}
                           >
                             {isExpanded ? 'Cerrar' : 'Ver'}
                           </button>
+                        )}
+                        {enr.estado === 'revocado' && (
+                          <>
+                            <button
+                              onClick={() => setExpandedId(isExpanded ? null : enr.id)}
+                              style={{ ...btn.secondary, fontSize: '0.8rem', padding: '0.3rem 0.75rem', marginRight: 6 }}
+                            >
+                              {isExpanded ? 'Cerrar' : 'Ver'}
+                            </button>
+                            <button
+                              onClick={() => handleReset(enr.id)}
+                              disabled={loading}
+                              style={{ ...btn.primary, fontSize: '0.8rem', padding: '0.3rem 0.75rem' }}
+                            >
+                              Reactivar
+                            </button>
+                          </>
                         )}
                       </td>
                     </tr>

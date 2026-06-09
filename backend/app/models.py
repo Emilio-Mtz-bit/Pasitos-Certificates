@@ -99,7 +99,7 @@ class Enrollment(Base):
 class Certificate(Base):
     __tablename__ = "certificates"
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    enrollment_id = Column(String, ForeignKey("enrollments.id"), unique=True, nullable=False)
+    enrollment_id = Column(String, ForeignKey("enrollments.id"), nullable=False)
     gpg_key_id = Column(String, ForeignKey("gpg_keys.id"), nullable=False)
     no_certificado = Column(String(20), unique=True, nullable=False)
     folio_verificacion = Column(String(20), unique=True, nullable=False)

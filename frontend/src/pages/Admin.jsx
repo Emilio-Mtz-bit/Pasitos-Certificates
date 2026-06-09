@@ -39,8 +39,8 @@ export default function Admin() {
         ))}
       </div>
 
-      {tab === 'pendientes' && <PendientesTab />}
-      {tab === 'certificados' && <CertificadosTab />}
+      <div style={{ display: tab === 'pendientes' ? 'block' : 'none' }}><PendientesTab /></div>
+      <div style={{ display: tab === 'certificados' ? 'block' : 'none' }}><CertificadosTab /></div>
     </div>
   )
 }
@@ -49,6 +49,8 @@ function PendientesTab() {
   const [enrollments, setEnrollments] = useState([])
   const [selected, setSelected] = useState(null)
   const [showModal, setShowModal] = useState(false)
+  const [showRejectModal, setShowRejectModal] = useState(false)
+  const [rejectObs, setRejectObs] = useState('')
   const [emitted, setEmitted] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -77,7 +79,9 @@ function PendientesTab() {
   async function handleReject() {
     setLoading(true); setError('')
     try {
-      await api.rejectEnrollment(selected.id)
+      await api.rejectEnrollment(selected.id, rejectObs.trim() || null)
+      setShowRejectModal(false)
+      setRejectObs('')
       setSelected(null)
       await loadPending()
     } catch (e) { setError(e.message) }
@@ -175,12 +179,47 @@ function PendientesTab() {
               </div>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
                 <button style={btn.primary} onClick={() => setShowModal(true)}>Emitir certificado</button>
-                <button style={btn.danger} onClick={handleReject} disabled={loading}>Devolver al instructor</button>
+                <button style={btn.danger} onClick={() => { setRejectObs(''); setShowRejectModal(true) }} disabled={loading}>Devolver al instructor</button>
               </div>
             </>
           )}
         </div>
       </div>
+
+      {showRejectModal && selected && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
+          <div style={{ ...card, maxWidth: 480, width: '90%' }}>
+            <h2 style={{ color: '#dc3545', fontWeight: 800, marginTop: 0 }}>Devolver al instructor</h2>
+            <p style={{ color: colors.textLight, fontSize: '0.9rem', marginBottom: '1rem' }}>
+              La inscripción regresará a borrador. El instructor podrá corregirla y enviarla de nuevo.
+            </p>
+            <div style={{ background: colors.light, borderRadius: 10, padding: '1rem', marginBottom: '1rem', fontSize: '0.95rem' }}>
+              <div><strong>Participante:</strong> {selected.participant.nombre_completo}</div>
+              <div><strong>Curso:</strong> {selected.course.nombre}</div>
+            </div>
+            <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', color: colors.text, marginBottom: '0.4rem' }}>
+              Motivo del rechazo (opcional)
+            </label>
+            <textarea
+              value={rejectObs}
+              onChange={e => setRejectObs(e.target.value)}
+              placeholder="Describe qué debe corregir el instructor..."
+              rows={4}
+              style={{
+                width: '100%', padding: '0.6rem 0.8rem', border: `1px solid ${colors.border}`,
+                borderRadius: 8, fontSize: '0.9rem', fontFamily: font,
+                resize: 'vertical', boxSizing: 'border-box', marginBottom: '1.25rem',
+              }}
+            />
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+              <button style={btn.secondary} onClick={() => setShowRejectModal(false)} disabled={loading}>Cancelar</button>
+              <button style={btn.danger} onClick={handleReject} disabled={loading}>
+                {loading ? 'Devolviendo...' : 'Confirmar devolución'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showModal && selected && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>

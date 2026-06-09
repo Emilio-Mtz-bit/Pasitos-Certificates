@@ -12,6 +12,43 @@ with engine.connect() as _conn:
         _conn.execute(text("ALTER TABLE certificates ADD COLUMN pdf_path TEXT"))
         _conn.commit()
 
+with engine.connect() as _conn:
+    _indexes = _conn.execute(text("PRAGMA index_list('certificates')")).fetchall()
+    _needs_migration = False
+    for _idx in _indexes:
+        _idx_name, _is_unique = _idx[1], _idx[2]
+        if _is_unique:
+            _cols_info = _conn.execute(text(f"PRAGMA index_info('{_idx_name}')")).fetchall()
+            if any(_c[2] == 'enrollment_id' for _c in _cols_info):
+                _needs_migration = True
+                break
+
+    if _needs_migration:
+        _conn.execute(text("PRAGMA foreign_keys=OFF"))
+        _conn.execute(text("""
+            CREATE TABLE certificates_new (
+                id VARCHAR NOT NULL,
+                enrollment_id VARCHAR NOT NULL,
+                gpg_key_id VARCHAR NOT NULL,
+                no_certificado VARCHAR(20) NOT NULL UNIQUE,
+                folio_verificacion VARCHAR(20) NOT NULL UNIQUE,
+                cert_hash VARCHAR(64) NOT NULL,
+                firma_gpg TEXT NOT NULL,
+                estado VARCHAR NOT NULL,
+                fecha_emision DATE,
+                pdf_path VARCHAR,
+                created_at DATETIME DEFAULT (CURRENT_TIMESTAMP),
+                PRIMARY KEY (id),
+                FOREIGN KEY(enrollment_id) REFERENCES enrollments(id),
+                FOREIGN KEY(gpg_key_id) REFERENCES gpg_keys(id)
+            )
+        """))
+        _conn.execute(text("INSERT INTO certificates_new SELECT * FROM certificates"))
+        _conn.execute(text("DROP TABLE certificates"))
+        _conn.execute(text("ALTER TABLE certificates_new RENAME TO certificates"))
+        _conn.execute(text("PRAGMA foreign_keys=ON"))
+        _conn.commit()
+
 app = FastAPI(title="Pasitos Certificates API", version="1.0.0-demo")
 
 app.add_middleware(
