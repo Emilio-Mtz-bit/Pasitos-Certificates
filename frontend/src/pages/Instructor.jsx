@@ -156,6 +156,7 @@ export default function Instructor() {
 
   async function handleModalCreate() {
     if (!newP.nombre_completo.trim()) { setError('El nombre completo es obligatorio'); return }
+    if (newP.curp.trim().length !== 18) { setError('La CURP debe tener 18 caracteres'); return }
     setLoading(true); setError('')
     try {
       const p = await api.createParticipant(newP)
@@ -165,6 +166,7 @@ export default function Instructor() {
   }
 
   async function handleModalEnroll() {
+    if (!modalParticipant) { setError('Error: no hay participante seleccionado'); return }
     if (!enrollForm.fecha_inicio || !enrollForm.fecha_termino || !enrollForm.calificacion) {
       setError('Completa todos los campos'); return
     }
