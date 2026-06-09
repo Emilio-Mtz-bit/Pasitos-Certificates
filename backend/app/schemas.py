@@ -62,6 +62,7 @@ class EnrollmentOut(BaseModel):
     calificacion: Optional[Decimal] = None
     resultado: str
     estado: str
+    observaciones: Optional[str] = None
     participant: ParticipantOut
     course: CourseOut
 

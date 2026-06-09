@@ -8,7 +8,7 @@ router = APIRouter(prefix="/enrollments", tags=["enrollments"])
 
 
 @router.get("/", response_model=list[schemas.EnrollmentOut])
-def list_enrollments(estado: str = None, db: Session = Depends(get_db)):
+def list_enrollments(estado: str = None, course_id: str = None, db: Session = Depends(get_db)):
     query = db.query(models.Enrollment)
     if estado:
         try:
@@ -16,6 +16,8 @@ def list_enrollments(estado: str = None, db: Session = Depends(get_db)):
             query = query.filter(models.Enrollment.estado == estado_enum)
         except ValueError:
             raise HTTPException(status_code=400, detail=f"Estado inválido: {estado}")
+    if course_id:
+        query = query.filter(models.Enrollment.course_id == course_id)
     return query.order_by(models.Enrollment.created_at.desc()).all()
 
 
